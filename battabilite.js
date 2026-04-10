@@ -27,25 +27,25 @@ const SNAMES = Object.keys(SOILS);
 /* ─── PRESET DATA ─── */
 const PDATA = {
   nadorZ1: [
-    { name:'Remblai 0-200mm',     from:-1,  to:-7,  qc:5,  fs:58,  qp:0   },
+    { name:'Remblai 0-200mm',     from:-6,  to:-7,  qc:5,  fs:58,  qp:0   },
     { name:'Sable lâche',         from:-7,  to:-23, qc:34, fs:170, qp:0   },
     { name:'Sable dense',         from:-23, to:-27, qc:50, fs:250, qp:0   },
     { name:'Tuf volcanique sain', from:-27, to:-45, qc:53, fs:245, qp:3.1 },
   ],
   nadorZ2: [
-    { name:'Remblai 0-200mm',     from:-7,  to:-21, qc:5,  fs:58,  qp:0   },
+    { name:'Remblai 0-200mm',     from:-20,  to:-21, qc:5,  fs:58,  qp:0   },
     { name:'Sable lâche',         from:-21, to:-26, qc:34, fs:170, qp:0   },
     { name:'Sable dense',         from:-26, to:-30, qc:50, fs:250, qp:0   },
     { name:'Tuf volcanique sain', from:-30, to:-48, qc:53, fs:245, qp:3.1 },
   ],
   nadorZ3: [
-    { name:'Remblai 0-200mm',     from:-7,  to:-21, qc:5,  fs:58,  qp:0   },
+    { name:'Remblai 0-200mm',     from:-20,  to:-21, qc:5,  fs:58,  qp:0   },
     { name:'Sable lâche',         from:-21, to:-28, qc:34, fs:170, qp:0   },
     { name:'Sable dense',         from:-28, to:-33, qc:50, fs:250, qp:0   },
     { name:'Tuf volcanique sain', from:-33, to:-52, qc:53, fs:245, qp:3.1 },
   ],
   nadorZ4: [
-    { name:'Remblai 0-200mm',     from:-10, to:-21, qc:5,  fs:58,  qp:0   },
+    { name:'Remblai 0-200mm',     from:-20, to:-21, qc:5,  fs:58,  qp:0   },
     { name:'Sable lâche',         from:-21, to:-27, qc:34, fs:170, qp:0   },
     { name:'Sable dense',         from:-27, to:-37, qc:50, fs:250, qp:0   },
     { name:'Tuf volcanique sain', from:-37, to:-58, qc:53, fs:245, qp:3.1 },
