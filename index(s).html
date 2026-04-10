@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battabilite des Pieux Metalliques</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f3f8;color:#1a1a2e;min-height:100vh}
+header{background:linear-gradient(135deg,#1a2f5e,#2557a7);color:#fff}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;flex-wrap:wrap;gap:10px}
+.hdr-inner h1{font-size:18px;font-weight:700}.hdr-inner p{font-size:11px;opacity:.7;margin-top:2px}
+.hdr-sub{font-size:11px;opacity:.8;padding:5px 2rem 10px;border-top:1px solid rgba(255,255,255,.12)}
+.tabs-bar{display:flex;background:#fff;border-bottom:2px solid #e0e4ee;overflow-x:auto}
+.tab-btn{padding:12px 22px;border:none;background:transparent;font-size:14px;font-weight:500;cursor:pointer;color:#666;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab-btn.active{color:#2557a7;border-bottom-color:#2557a7}
+.tab-btn:hover:not(.active){color:#2557a7;background:#f5f8ff}
+.wrap{max-width:1000px;margin:0 auto;padding:1.5rem 1rem}
+.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.card-title{font-size:12px;font-weight:700;color:#2557a7;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:4px;height:16px;background:#2557a7;border-radius:2px;flex-shrink:0}
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
+.case-card{border:2px solid #e0e4ee;border-radius:12px;padding:1.2rem;cursor:pointer;transition:all .15s;background:#fafbff}
+.case-card:hover{border-color:#2557a7;background:#f0f5ff}
+.case-card.active{border-color:#2557a7;background:#e8f0fe}
+.case-card h3{font-size:15px;font-weight:700;color:#1a2f5e;margin-bottom:4px}
+.case-card p{font-size:12px;color:#666;line-height:1.5}
+.case-tag{display:inline-block;background:#d6eaf8;color:#1a5276;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:6px}
+.case-card.active .case-tag{background:#2557a7;color:#fff}
+.strati-wrap{display:flex;gap:14px}
+.strati-svg-col{width:52px;flex-shrink:0}
+.layers-col{flex:1}
+.layer-item{border:1.5px solid #e0e4ee;border-radius:9px;margin-bottom:8px;overflow:hidden}
+.layer-hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;background:#f8f9fc}
+.layer-hdr:hover{background:#f0f4fb}
+.ldot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.lname{font-size:13px;font-weight:600;flex:1}
+.linfo{font-size:10px;color:#999}
+.ldel{background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;line-height:1;padding:0 2px}
+.ldel:hover{color:#c0392b}
+.lbody{padding:10px;border-top:1px solid #f0f0f5;display:none;background:#fff}
+.lbody.open{display:block}
+.btn-add-layer{width:100%;padding:8px;border:2px dashed #c5cce0;border-radius:8px;background:transparent;color:#8892a4;font-size:13px;cursor:pointer;margin-top:4px}
+.btn-add-layer:hover{border-color:#2557a7;color:#2557a7;background:#f0f5ff}
+.soil-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.spr-btn{padding:5px 12px;border:1.5px solid #d0d6e8;border-radius:20px;background:#f5f8ff;font-size:12px;cursor:pointer;color:#2557a7;font-weight:500}
+.spr-btn:hover{background:#2557a7;color:#fff;border-color:#2557a7}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:580px){.g2,.g3,.case-grid{grid-template-columns:1fr}}
+.f{margin-bottom:8px}
+.f label{display:block;font-size:12px;color:#555;margin-bottom:3px;font-weight:500}
+.f input,.f select{width:100%;height:36px;padding:0 10px;border:1.5px solid #d8dcea;border-radius:8px;background:#fafbff;color:#1a1a2e;font-size:13px}
+.f input:focus,.f select:focus{outline:none;border-color:#2557a7;background:#fff}
+.fn{font-size:10px;color:#999;margin-top:2px;font-style:italic}
+.u{font-size:10px;color:#aaa}
+.hammer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.hcard{border:1.5px solid #e0e4ee;border-radius:8px;padding:10px;cursor:pointer;text-align:center;transition:all .15s;background:#fafbff}
+.hcard:hover{border-color:#2557a7}.hcard.active{border-color:#2557a7;background:#e8f0fe}
+.hcard .hn{font-size:13px;font-weight:700;color:#1a2f5e}.hcard .hd{font-size:10px;color:#888;margin-top:2px}
+.nzgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.nzb{padding:10px;border:2px solid #e0e4ee;border-radius:8px;background:#fafbff;cursor:pointer;text-align:center}
+.nzb.active{border-color:#2557a7;background:#e8f0fe}
+.nzb .nzn{font-size:14px;font-weight:700;color:#1a2f5e}.nzb .nzc{font-size:10px;color:#888}.nzb .nzt{font-size:11px;color:#e67e22;font-weight:600;margin-top:2px}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,#1a2f5e,#2557a7);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn-primary:hover{opacity:.9}
+.vbox{text-align:center;padding:1.5rem;border-radius:14px;margin-bottom:14px;border:2.5px solid}
+.vbox.battable{background:#e8f8f1;border-color:#27ae60}
+.vbox.attention{background:#fef9ec;border-color:#e67e22}
+.vbox.non-battable{background:#fef5f5;border-color:#c0392b}
+.vtitle{font-size:26px;font-weight:800;letter-spacing:.04em}
+.vtitle.battable{color:#1e7e34}.vtitle.attention{color:#c05000}.vtitle.non-battable{color:#a32d2d}
+.vsub{font-size:13px;color:#666;margin-top:6px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:14px}
+.mcard{background:#f4f7fc;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid #e0e4ee}
+.mcard.green{background:#eafaef;border-color:#27ae60}.mcard.red{background:#fef0f0;border-color:#c0392b}.mcard.orange{background:#fff3e0;border-color:#e67e22}
+.mlb{font-size:11px;color:#888;margin-bottom:6px;font-weight:500;line-height:1.3}
+.mval{font-size:22px;font-weight:700;color:#1a2f5e}
+.mu{font-size:10px;color:#aaa;margin-top:2px}
+.rtbl{width:100%;border-collapse:collapse;font-size:13px}
+.rtbl th{background:#1a2f5e;color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:600}
+.rtbl td{padding:7px 10px;border-bottom:1px solid #f0f2f8}
+.rtbl tr:hover td{background:#f8faff}
+.bge{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600}
+.bge.ok{background:#d4efdf;color:#1e7e34}.bge.warn{background:#fdebd0;color:#935116}.bge.err{background:#fadbd8;color:#922b21}
+.irow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f5f5f8;font-size:13px}
+.irow:last-child{border-bottom:none}
+.ilb{color:#888;font-size:12px}
+.abox{padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:12px;border-left:4px solid;line-height:1.5}
+.abox.ok{background:#eafaef;border-color:#27ae60;color:#1a5c2e}
+.abox.warn{background:#fef9ec;border-color:#e67e22;color:#784212}
+.abox.info{background:#eaf4fc;border-color:#2980b9;color:#1a4971}
+footer{text-align:center;padding:1.2rem;font-size:12px;color:#888;margin-top:1rem;border-top:1px solid #e0e4ee}
+footer strong{color:#2557a7}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr-inner">
+    <div><h1>Etude de Battabilite des Pieux Metalliques</h1><p>Determination des criteres de refus — Analyse geotechnique et dynamique</p></div>
+  </div>
+  <div class="hdr-sub">Developpee par <strong>Alaa Eddine Ezzebdi</strong> &amp; <strong>Yahya Sarouf</strong> &mdash; Projet de Fin d'Etudes, Genie Civil</div>
+</header>
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="sw('cas')">Choix du cas</button>
+  <button class="tab-btn" onclick="sw('sol')">Profil de sol</button>
+  <button class="tab-btn" onclick="sw('pieu')">Pieu et Marteau</button>
+  <button class="tab-btn" onclick="sw('resultats')">Resultats</button>
+</div>
+<div class="wrap">
+
+<!-- CAS -->
+<div class="panel active" id="tab-cas">
+  <div class="card">
+    <div class="card-title">Choisissez votre cas d'etude</div>
+    <div class="case-grid">
+      <div class="case-card active" id="cc-general" onclick="selectCase('general')">
+        <h3>Cas general</h3>
+        <p>Saisissez votre propre profil de sol multicouches, les dimensions de votre pieu et les parametres de votre marteau. Applicable a tout projet de fondations profondes sur pieux metalliques battus.</p>
+        <span class="case-tag">Parametres libres</span>
+      </div>
+      <div class="case-card" id="cc-nador" onclick="selectCase('nador')">
+        <h3>Port Nador West Med &mdash; TCO</h3>
+        <p>Extension du terminal a conteneurs Ouest. Profil geotechnique calibre sur les registres de battage du chantier (pieux OA109, OA110, OA111, OB102, OB103, OB104). Energie ~255 kJ, refus OA : 60-65 coups/10cm, OB : 28-35 coups/10cm.</p>
+        <span class="case-tag">Donnees chantier reelles</span>
+      </div>
+    </div>
+  </div>
+  <div id="nador-panel" style="display:none">
+    <div class="card">
+      <div class="card-title">Zone geotechnique — Nador West Med</div>
+      <div class="nzgrid">
+        <div class="nzb active" id="nzb1" onclick="loadNZ(1)"><div class="nzn">Zone I</div><div class="nzc">CH 600-900</div><div class="nzt">Tuf a -27m</div></div>
+        <div class="nzb" id="nzb2" onclick="loadNZ(2)"><div class="nzn">Zone II</div><div class="nzc">CH 900-1120</div><div class="nzt">Tuf a -30m</div></div>
+        <div class="nzb" id="nzb3" onclick="loadNZ(3)"><div class="nzn">Zone III</div><div class="nzc">CH 1120-1250</div><div class="nzt">Tuf a -33m</div></div>
+        <div class="nzb" id="nzb4" onclick="loadNZ(4)"><div class="nzn">Zone IV</div><div class="nzc">CH 1250-1440</div><div class="nzt">Tuf a -37m</div></div>
+      </div>
+      <div class="abox info" id="nz-info">Zone II selectionnee — Calibre sur OA109 (63c/10cm), OA110 (65c/10cm), OB102-103 (30c/10cm). Energie chantier ~255 kJ.</div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="sw('sol')">Suivant : Definir le profil de sol</button>
+</div>
+
+<!-- SOL -->
+<div class="panel" id="tab-sol">
+  <div class="card">
+    <div class="card-title">Ajouter rapidement un type de sol</div>
+    <div class="soil-presets">
+      <button class="spr-btn" onclick="addPreset('vase')">Vase / Argile molle</button>
+      <button class="spr-btn" onclick="addPreset('sable_lache')">Sable lache</button>
+      <button class="spr-btn" onclick="addPreset('sable_moyen')">Sable moyen</button>
+      <button class="spr-btn" onclick="addPreset('sable_dense')">Sable dense</button>
+      <button class="spr-btn" onclick="addPreset('gravier')">Gravier / Conglomerat</button>
+      <button class="spr-btn" onclick="addPreset('argile_raide')">Argile raide</button>
+      <button class="spr-btn" onclick="addPreset('marne')">Marne</button>
+      <button class="spr-btn" onclick="addPreset('tuf')">Tuf volcanique</button>
+      <button class="spr-btn" onclick="addPreset('roche')">Roche / Calcaire</button>
+      <button class="spr-btn" onclick="addPreset('remblai')">Remblai / Enrochement</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Profil stratigraphique — de haut en bas</div>
+    <div class="strati-wrap">
+      <div class="strati-svg-col"><svg id="svgs" viewBox="0 0 52 400" xmlns="http://www.w3.org/2000/svg" style="width:52px;display:block"></svg></div>
+      <div class="layers-col"><div id="lc"></div><button class="btn-add-layer" onclick="addLayer()">+ Ajouter une couche manuellement</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Niveaux de reference</div>
+    <div class="g2">
+      <div class="f"><label>Niveau de depart du battage <span class="u">(m)</span></label><input type="number" id="dep" value="-21" step="0.5"><div class="fn">Fond marin ou niveau apres dragage (peut etre negatif)</div></div>
+      <div class="f"><label>Cote de refus visee <span class="u">(m)</span></label><input type="number" id="cref" value="-41.5" step="0.5"><div class="fn">Negative = sous zero hydrographique</div></div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="sw('pieu')">Suivant : Pieu et Marteau</button>
+</div>
+
+<!-- PIEU -->
+<div class="panel" id="tab-pieu">
+  <div class="card">
+    <div class="card-title">Marteaux predefinies — cliquez pour charger</div>
+    <div class="hammer-grid">
+      <div class="hcard active" id="hm-ihc250" onclick="loadH('ihc250')"><div class="hn">IHC SC-250</div><div class="hd">Hydraulique &mdash; 244 kJ</div></div>
+      <div class="hcard" id="hm-ihc2300" onclick="loadH('ihc2300')"><div class="hn">IHC S-2300</div><div class="hd">Hydraulique &mdash; 230 kJ</div></div>
+      <div class="hcard" id="hm-d36" onclick="loadH('d36')"><div class="hn">DELMAG D-36</div><div class="hd">Diesel &mdash; 100 kJ</div></div>
+      <div class="hcard" id="hm-d62" onclick="loadH('d62')"><div class="hn">DELMAG D-62</div><div class="hd">Diesel &mdash; 170 kJ</div></div>
+      <div class="hcard" id="hm-custom" onclick="loadH('custom')"><div class="hn">Autre marteau</div><div class="hd">Saisie manuelle</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Caracteristiques du pieu</div>
+    <div class="g3">
+      <div class="f"><label>Type de pieu</label><select id="tp"><option value="tube_ouvert">Tube ouvert</option><option value="tube_ferme">Tube ferme</option><option value="HP">HP &mdash; H pile</option></select></div>
+      <div class="f"><label>Grade d'acier</label><select id="acier"><option value="448">X65 &mdash; fy=448 MPa</option><option value="460">S460 &mdash; fy=460 MPa</option><option value="355">S355 &mdash; fy=355 MPa</option><option value="275">S275 &mdash; fy=275 MPa</option></select></div>
+      <div class="f"><label>Longueur totale L <span class="u">(m)</span></label><input type="number" id="LL" value="25" step="0.5"></div>
+      <div class="f"><label>Diametre exterieur D <span class="u">(mm)</span></label><input type="number" id="DD" value="1422" step="1"></div>
+      <div class="f"><label>Epaisseur paroi e <span class="u">(mm)</span></label><input type="number" id="EE" value="20.6" step="0.1"></div>
+      <div class="f"><label>Masse lineique <span class="u">(kg/m)</span></label><input type="number" id="ML" value="716" step="1"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parametres du marteau</div>
+    <div class="g3">
+      <div class="f"><label>Type</label><select id="tm"><option value="hydraulique">Hydraulique</option><option value="diesel">Diesel</option><option value="drop">Mouton libre</option></select></div>
+      <div class="f"><label>Energie nominale Wr <span class="u">(kJ)</span></label><input type="number" id="WR" value="243.8" step="0.5"></div>
+      <div class="f"><label>Rendement eta <span class="u">(%)</span></label><input type="number" id="ET" value="90" step="1"><div class="fn">Hydraulique : 85-95% / Diesel : 75-85%</div></div>
+      <div class="f"><label>Masse mouton M <span class="u">(kg)</span></label><input type="number" id="MM" value="16900" step="100"></div>
+      <div class="f"><label>Hauteur de chute H <span class="u">(m)</span></label><input type="number" id="HH" value="1.47" step="0.01"></div>
+      <div class="f"><label>Cadence <span class="u">(coups/min)</span></label><input type="number" id="CA" value="40" step="5"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Charge requise</div>
+    <div class="g3">
+      <div class="f"><label>Charge de service SLS Q <span class="u">(kN)</span></label><input type="number" id="QQ" value="9270" step="100"></div>
+      <div class="f"><label>Coefficient de securite gamma</label><select id="GM"><option value="2.0">2.0 &mdash; avec essais dynamiques</option><option value="2.5">2.5 &mdash; methode statique</option><option value="3.0">3.0 &mdash; conservateur</option></select></div>
+      <div class="f"><label>Charge de refus Qr <span class="u">(kN)</span></label><input type="number" id="QRA" readonly style="background:#f0f5ff;font-weight:700;color:#2557a7" value="18540"></div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="calc()">Calculer la battabilite</button>
+</div>
+
+<!-- RESULTATS -->
+<div class="panel" id="tab-resultats">
+  <div id="rz"><p style="text-align:center;padding:3rem;color:#aaa;font-size:14px">Completez les trois etapes et cliquez sur Calculer.</p></div>
+</div>
+
+</div>
+<footer>Developpee par <strong>Alaa Eddine Ezzebdi</strong> &amp; <strong>Yahya Sarouf</strong> &mdash; Projet de Fin d'Etudes, Genie Civil &mdash; Battabilite des pieux metalliques, Port Nador West Med</footer>
+
+<script>
+var CC='general', CZ=2, layers=[], nid=0;
+
+var SP={
+  vase:        {lb:'Vase / Argile molle',     col:'#8B9DC3',ep:5, fs:20, qp:0.3,phi:15,c:20},
+  sable_lache: {lb:'Sable lache',             col:'#FAD7A0',ep:5, fs:50, qp:1.5,phi:28,c:0},
+  sable_moyen: {lb:'Sable moyen',             col:'#F0B27A',ep:5, fs:100,qp:5.0,phi:33,c:0},
+  sable_dense: {lb:'Sable dense',             col:'#E59866',ep:5, fs:150,qp:10.0,phi:38,c:0},
+  gravier:     {lb:'Gravier / Conglomerat',   col:'#A9A9A9',ep:5, fs:180,qp:15.0,phi:40,c:0},
+  argile_raide:{lb:'Argile raide',            col:'#7D6608',ep:5, fs:80, qp:2.0,phi:25,c:80},
+  marne:       {lb:'Marne',                   col:'#6C8EBF',ep:5, fs:120,qp:3.0,phi:30,c:50},
+  tuf:         {lb:'Tuf volcanique',          col:'#922B21',ep:15,fs:245,qp:3.1,phi:46,c:79},
+  roche:       {lb:'Roche / Calcaire',        col:'#5D6D7E',ep:10,fs:300,qp:20.0,phi:50,c:200},
+  remblai:     {lb:'Remblai / Enrochement',   col:'#B7950B',ep:3, fs:60, qp:2.0,phi:36,c:0}
+};
+var HM={
+  ihc250: {type:'hydraulique',Wr:243.8,eta:90,M:16900,H:1.47},
+  ihc2300:{type:'hydraulique',Wr:230.0,eta:88,M:16000,H:1.44},
+  d36:    {type:'diesel',     Wr:100.0,eta:80,M:3600, H:2.84},
+  d62:    {type:'diesel',     Wr:170.0,eta:80,M:6200, H:2.80},
+  custom: {type:'hydraulique',Wr:100.0,eta:85,M:10000,H:1.0}
+};
+var NZ={
+  1:{label:'Zone I (CH 600-900)', dep:-21,cote:-39.5,rOA:60,rOB:30,
+     info:'Calibre sur donnees chantier. Refus type OA : ~60 coups/10cm. Refus type OB : ~30 coups/10cm.',
+     layers:[{lb:'Enrochement 0-200mm',col:'#B7950B',ep:1.5,fs:60,qp:2.0,phi:36,c:0},
+             {lb:'Sable coquillier lache',col:'#FAD7A0',ep:1.5,fs:80,qp:2.0,phi:32,c:0},
+             {lb:'Sable dense',col:'#E59866',ep:4,fs:150,qp:8.0,phi:36,c:0},
+             {lb:'Tuf volcanique',col:'#922B21',ep:14,fs:245,qp:3.1,phi:46,c:79}]},
+  2:{label:'Zone II (CH 900-1120)',dep:-21,cote:-41.5,rOA:63,rOB:30,
+     info:'Calibre sur OA109 (63c/10cm a -40.5mZH), OA110 (65c), OA111 (60c), OB102-103 (30c), OB104 (30c). Energie chantier ~255 kJ.',
+     layers:[{lb:'Enrochement 0-200mm',col:'#B7950B',ep:1.5,fs:60,qp:2.0,phi:36,c:0},
+             {lb:'Sable coquillier lache',col:'#FAD7A0',ep:1.5,fs:80,qp:2.0,phi:32,c:0},
+             {lb:'Sable dense',col:'#E59866',ep:4,fs:150,qp:8.0,phi:36,c:0},
+             {lb:'Tuf volcanique',col:'#922B21',ep:17,fs:245,qp:3.1,phi:46,c:79}]},
+  3:{label:'Zone III (CH 1120-1250)',dep:-21,cote:-44.0,rOA:60,rOB:20,
+     info:'Zone III — Tuf volcanique a -33 mZH. Refus type OA : ~60 coups/10cm.',
+     layers:[{lb:'Enrochement 0-200mm',col:'#B7950B',ep:1.5,fs:60,qp:2.0,phi:36,c:0},
+             {lb:'Sable coquillier lache',col:'#FAD7A0',ep:1.5,fs:80,qp:2.0,phi:32,c:0},
+             {lb:'Sable dense',col:'#E59866',ep:4,fs:150,qp:8.0,phi:36,c:0},
+             {lb:'Tuf volcanique',col:'#922B21',ep:20,fs:245,qp:3.1,phi:46,c:79}]},
+  4:{label:'Zone IV (CH 1250-1440)',dep:-21,cote:-46.7,rOA:40,rOB:20,
+     info:'Zone IV — Tuf volcanique a -37 mZH. Refus type OA : ~40 coups/10cm.',
+     layers:[{lb:'Enrochement 0-200mm',col:'#B7950B',ep:1.5,fs:60,qp:2.0,phi:36,c:0},
+             {lb:'Sable coquillier lache',col:'#FAD7A0',ep:1.5,fs:80,qp:2.0,phi:32,c:0},
+             {lb:'Sable dense',col:'#E59866',ep:6,fs:150,qp:8.0,phi:36,c:0},
+             {lb:'Tuf volcanique',col:'#922B21',ep:23,fs:245,qp:3.1,phi:46,c:79}]}
+};
+
+function sw(n){
+  ['cas','sol','pieu','resultats'].forEach(function(nm,i){
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active',nm===n);
+    document.getElementById('tab-'+nm).classList.toggle('active',nm===n);
+  });
+}
+
+function gv(id){return parseFloat(document.getElementById(id).value)||0;}
+function gs(id){return document.getElementById(id).value;}
+
+function selectCase(c){
+  CC=c;
+  ['general','nador'].forEach(function(x){document.getElementById('cc-'+x).classList.toggle('active',x===c);});
+  document.getElementById('nador-panel').style.display=c==='nador'?'block':'none';
+  if(c==='nador'){
+    loadNZ(2);
+    loadH('ihc250');
+    document.getElementById('DD').value=1422;document.getElementById('EE').value=20.6;
+    document.getElementById('LL').value=25;document.getElementById('ML').value=716;
+    document.getElementById('acier').value='448';document.getElementById('QQ').value=9270;
+    document.getElementById('GM').value='2.0';updQr();
+  } else {
+    layers=[];
+    renderLayers();
+  }
+}
+
+function loadNZ(z){
+  CZ=z;
+  document.querySelectorAll('[id^="nzb"]').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('nzb'+z).classList.add('active');
+  var zd=NZ[z];
+  document.getElementById('nz-info').textContent=zd.info;
+  document.getElementById('dep').value=zd.dep;
+  document.getElementById('cref').value=zd.cote;
+  layers=zd.layers.map(function(l){return Object.assign({},l,{id:nid++});});
+  renderLayers();
+}
+
+function loadH(h){
+  document.querySelectorAll('[id^="hm-"]').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('hm-'+h).classList.add('active');
+  var hd=HM[h];if(!hd)return;
+  document.getElementById('tm').value=hd.type;
+  document.getElementById('WR').value=hd.Wr;document.getElementById('ET').value=hd.eta;
+  document.getElementById('MM').value=hd.M;document.getElementById('HH').value=hd.H;
+}
+
+function addPreset(t){
+  var p=SP[t];if(!p)return;
+  layers.push(Object.assign({},p,{id:nid++}));renderLayers();
+}
+function addLayer(){
+  var cols=['#FAD7A0','#E59866','#922B21','#6C8EBF','#A9A9A9'];
+  layers.push({id:nid++,lb:'Nouvelle couche',col:cols[layers.length%5],ep:5,fs:100,qp:3.0,phi:30,c:0});
+  renderLayers();
+}
+function removeLayer(id){layers=layers.filter(function(l){return l.id!==id;});renderLayers();}
+function togLayer(id){var b=document.getElementById('lb-'+id);if(b)b.classList.toggle('open');}
+function updL(id,f,v){
+  var l=layers.find(function(x){return x.id===id;});if(!l)return;
+  if(['ep','fs','qp','phi','c'].includes(f))l[f]=parseFloat(v)||0;else l[f]=v;
+  renderLayers();
+}
+
+function renderLayers(){
+  var dep=gv('dep')||0,tot=layers.reduce(function(s,l){return s+l.ep;},0),html='',prof=0;
+  layers.forEach(function(l,i){
+    var et=dep-prof,eb=et-l.ep,col=l.col||'#999';
+    html+='<div class="layer-item">'+
+      '<div class="layer-hdr" onclick="togLayer('+l.id+')">'+
+      '<div class="ldot" style="background:'+col+'"></div>'+
+      '<div style="flex:1"><span class="lname">'+(i+1)+'. '+l.lb+'</span>'+
+      '<div class="linfo">'+l.ep+'m | '+et.toFixed(1)+' a '+eb.toFixed(1)+' m | fs='+l.fs+' kPa | qp='+l.qp+' MPa</div></div>'+
+      '<button class="ldel" onclick="event.stopPropagation();removeLayer('+l.id+')">&#215;</button></div>'+
+      '<div class="lbody" id="lb-'+l.id+'"><div class="g3">'+
+      '<div class="f"><label>Nom</label><input type="text" value="'+l.lb+'" onchange="updL('+l.id+',\'lb\',this.value)"></div>'+
+      '<div class="f"><label>Epaisseur <span class="u">(m)</span></label><input type="number" value="'+l.ep+'" step="0.5" min="0.1" onchange="updL('+l.id+',\'ep\',this.value)"></div>'+
+      '<div class="f"><label>fs frottement <span class="u">(kPa)</span></label><input type="number" value="'+l.fs+'" step="5" onchange="updL('+l.id+',\'fs\',this.value)"></div>'+
+      '<div class="f"><label>qp resistance pointe <span class="u">(MPa)</span></label><input type="number" value="'+l.qp+'" step="0.1" onchange="updL('+l.id+',\'qp\',this.value)"></div>'+
+      '<div class="f"><label>Angle phi\' <span class="u">(deg)</span></label><input type="number" value="'+(l.phi||30)+'" step="1" onchange="updL('+l.id+',\'phi\',this.value)"></div>'+
+      '<div class="f"><label>Cohesion c\' <span class="u">(kPa)</span></label><input type="number" value="'+(l.c||0)+'" step="5" onchange="updL('+l.id+',\'c\',this.value)"></div>'+
+      '</div></div></div>';
+    prof+=l.ep;
+  });
+  document.getElementById('lc').innerHTML=html;
+  var svg=document.getElementById('svgs');
+  if(!tot||!layers.length){svg.innerHTML='';return;}
+  var H=400,y=0,sh='';
+  layers.forEach(function(l){
+    var ht=Math.round((l.ep/tot)*H),c=l.col||'#999';
+    sh+='<rect x="6" y="'+y+'" width="40" height="'+ht+'" fill="'+c+'" rx="2"/>'; y+=ht;
+  });
+  svg.innerHTML=sh+'<rect x="6" y="0" width="40" height="'+H+'" fill="none" stroke="#ccc" stroke-width="1" rx="2"/>';
+}
+
+function updQr(){
+  var q=gv('QQ'),g=parseFloat(gs('GM')||2);
+  document.getElementById('QRA').value=Math.round(q*g);
+}
+document.getElementById('QQ').addEventListener('input',updQr);
+document.getElementById('GM').addEventListener('change',updQr);
+
+function bge(t,c){return '<span class="bge '+c+'">'+t+'</span>';}
+function mcard(lb,val,unit,c){return '<div class="mcard '+(c||'')+'"><div class="mlb">'+lb+'</div><div class="mval">'+val+'</div><div class="mu">'+unit+'</div></div>';}
+function irow(lb,val){return '<div class="irow"><span class="ilb">'+lb+'</span><span>'+val+'</span></div>';}
+
+function calc(){
+  if(!layers.length){alert('Ajoutez au moins une couche de sol.');return;}
+  var D=gv('DD')/1000,e=gv('EE')/1000,tp=gs('tp'),fy=parseFloat(gs('acier'))||448;
+  var Wr=gv('WR'),eta=gv('ET')/100;
+  var SLS=gv('QQ'),gam=parseFloat(gs('GM')||2);
+  var dep=gv('dep'),cote=gv('cref');
+  var Qr=SLS*gam,prof=dep-cote,E=eta*Wr;
+
+  if(prof<=0){alert('La profondeur battue doit etre positive. Verifiez les niveaux de depart et de refus.');return;}
+
+  var peri,An,Ap;
+  if(tp==='HP'){An=D*D*0.7*0.12;Ap=D*D*0.7;peri=4*D;}
+  else if(tp==='tube_ferme'){An=Math.PI*(D*e-e*e);Ap=Math.PI*(D/2)*(D/2);peri=Math.PI*D;}
+  else{An=Math.PI*(D*e-e*e);Ap=An;peri=Math.PI*D+Math.PI*(D-2*e);}
+
+  var Qs=0,qp_pt=layers[layers.length-1].qp,p=0,lrs=[];
+  layers.forEach(function(l){
+    var Leff=Math.max(0,Math.min(p+l.ep,prof)-Math.max(p,0));
+    if(Leff>0){
+      var Qi=l.fs*peri*Leff/1000;
+      lrs.push({lb:l.lb,ep:l.ep,Leff:Leff.toFixed(1),fs:l.fs,qp:l.qp,Qi:Qi.toFixed(0),col:l.col||'#999'});
+      Qs+=Qi;if(p+l.ep<=prof)qp_pt=l.qp;
+    }
+    p+=l.ep;
+  });
+  var Qp=qp_pt*1000*Ap,Qu=Qp+Qs;
+
+  // Critere de refus — calibre sur registres de battage Nador West Med Zone II
+  // Calibration :
+  // OA109 : E=255kJ, Qr=18540kN, coups=63/10cm -> s=10/63=0.159cm/coup -> k=Qr*s/E=18540*0.00159/255=0.1155
+  // OB102 : E=254kJ, Qr=12830kN, coups=30/10cm -> s=10/30=0.333cm/coup -> k=12830*0.00333/254=0.168
+  // Moyenne calibree k_cal = 0.14
+  var k_cal=0.14; // cm/coup par kJ/kN
+  var s_cm=E*k_cal/Qr;
+  if(s_cm<=0)s_cm=0.001;
+  var coups=Math.min(Math.round(10/s_cm),999);
+  var sigma=(Qr*1000)/An/1e6;
+  var p_ok=Qu>=Qr,s_ok=sigma<=fy,r_ok=coups>=3&&coups<=500;
+  var verdict,cls;
+  if(p_ok&&s_ok){verdict='SOL BATTABLE';cls='battable';}
+  else if(p_ok||s_ok){verdict='BATTABILITE CONDITIONNELLE';cls='attention';}
+  else{verdict='SOL NON BATTABLE';cls='non-battable';}
+
+  var html='';
+  html+='<div class="vbox '+cls+'"><div class="vtitle '+cls+'">'+verdict+'</div>'+
+    '<div class="vsub">Profondeur battue : '+prof.toFixed(1)+' m | D = '+Math.round(D*1000)+' mm | Qr = '+Qr.toFixed(0)+' kN</div></div>';
+
+  html+='<div class="mgrid">'+
+    mcard('Capacite portante Qu',Qu.toFixed(0),'kN',Qu>=Qr?'green':'red')+
+    mcard('Charge de refus Qr',Qr.toFixed(0),'kN','')+
+    mcard('Resistance pointe Qp',Qp.toFixed(0),'kN','')+
+    mcard('Frottement total Qs',Qs.toFixed(0),'kN','')+
+    mcard('Coups / 10 cm',coups,'coups',coups>=3&&coups<=500?'green':coups<3?'orange':'orange')+
+    mcard('Penetration / coup',s_cm.toFixed(2),'cm/coup','')+
+    mcard('Contrainte sigma',sigma.toFixed(0),'MPa (fy='+fy+')',sigma<=fy?'green':'red')+
+    mcard('Energie reelle eta*Wr',E.toFixed(1),'kJ','')+
+    '</div>';
+
+  html+='<div class="card"><div class="card-title">Frottement lateral par couche traversee</div>'+
+    '<table class="rtbl"><tr><th>#</th><th>Formation</th><th>Ep. (m)</th><th>L eff. (m)</th><th>fs (kPa)</th><th>qp (MPa)</th><th>Qs_i (kN)</th></tr>'+
+    lrs.map(function(r,i){return '<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+r.col+';margin-right:5px;vertical-align:middle"></span>'+(i+1)+'</td>'+
+      '<td>'+r.lb+'</td><td>'+r.ep+'</td><td>'+r.Leff+'</td><td><b>'+r.fs+'</b></td><td>'+r.qp+'</td><td><b>'+r.Qi+'</b></td></tr>';}).join('')+
+    '<tr style="background:#f0f5ff;font-weight:700"><td colspan="6">Qu total (Qp + Qs)</td><td>'+Qu.toFixed(0)+' kN</td></tr>'+
+    '</table></div>';
+
+  html+='<div class="card"><div class="card-title">Verification des criteres de battabilite</div>'+
+    '<table class="rtbl"><tr><th>Critere</th><th>Valeur calculee</th><th>Exigence</th><th>Statut</th></tr>'+
+    '<tr><td>Capacite portante Qu</td><td>'+Qu.toFixed(0)+' kN</td><td>&gt;= '+Qr.toFixed(0)+' kN</td><td>'+bge(p_ok?'SATISFAIT':'INSUFFISANT',p_ok?'ok':'err')+'</td></tr>'+
+    '<tr><td>Contrainte acier sigma</td><td>'+sigma.toFixed(0)+' MPa</td><td>&lt;= '+fy+' MPa</td><td>'+bge(s_ok?'OK':'DEPASSE',s_ok?'ok':'err')+'</td></tr>'+
+    '<tr><td>Refus atteignable (coups/10cm)</td><td>'+coups+' coups</td><td>3 a 500 coups</td><td>'+bge(r_ok?'BATTABLE':'VERIFIER',r_ok?'ok':'warn')+'</td></tr>'+
+    '</table></div>';
+
+  if(CC==='nador'){
+    var zn=NZ[CZ];
+    var D_mm=Math.round(D*1000);
+    var ref_coups=D_mm>=1400?zn.rOA:zn.rOB;
+    var diff=coups-ref_coups,pct=ref_coups>0?Math.round(Math.abs(diff)/ref_coups*100):0;
+    html+='<div class="card"><div class="card-title">Comparaison avec les registres de battage du chantier</div>'+
+      '<div class="g2"><div>'+
+      irow('Type pieu',D_mm>=1400?'Type OA (D>=1422mm)':'Type OB/C/D (D=1219mm)')+
+      irow('Coups mesures sur chantier','<b>'+ref_coups+' coups / 10 cm</b>')+
+      irow('Coups calcules','<b>'+coups+' coups / 10 cm</b>')+
+      irow('Ecart',(diff>=0?'+':'')+diff+' coups ('+pct+'%)')+
+      '</div><div>'+
+      irow('Cote de refus',zn.cote+' mZH')+
+      irow('Energie chantier','~250 a 262 kJ par coup')+
+      irow('Verdict chantier',bge('SOL BATTABLE','ok'))+
+      irow('Refus obtenu','OUI dans tous les registres')+
+      '</div></div>'+
+      '<div class="abox '+(pct<35?'ok':'warn')+'" style="margin-top:10px">'+
+      (pct<35?'Bonne concordance avec les registres de battage (ecart '+pct+'%). Le calcul est coherent avec la realite du chantier.':
+        'Ecart '+pct+'% avec les registres. Le sol est confirme battable sur ce chantier selon les registres OA109-111 et OB102-104. Ajustez les valeurs de fs et qp si necessaire.')+
+      '</div></div>';
+  }
+
+  var recos=[];
+  if(!p_ok) recos.push('Augmenter la longueur du pieu ou affiner les valeurs de fs et qp avec des essais in situ (CPT, SPT, PDA).');
+  if(!s_ok) recos.push('Augmenter l\'epaisseur de paroi ou choisir un grade d\'acier superieur (ex: X65 fy=448MPa).');
+  if(coups<3) recos.push('Marteau surdimensionne ou pieu tres facile a battre : reduire la hauteur de chute.');
+  if(coups>500) recos.push('Marteau insuffisant pour ce sol : augmenter la hauteur de chute ou la masse du mouton.');
+  if(!recos.length) recos.push('Parametres satisfaisants. Prevoir un suivi instrumente (PDA) lors des premiers pieux pour confirmer les criteres de refus.');
+
+  html+='<div class="card"><div class="card-title">Recommandations</div>'+
+    recos.map(function(r){return irow('&#8594;',r);}).join('')+'</div>';
+
+  html+='<div class="card"><div class="card-title">Recapitulatif des parametres</div><div class="g2"><div>'+
+    irow('Pieu','D='+Math.round(D*1000)+'mm | e='+(Math.round(e*10000)/10)+'mm | '+tp)+
+    irow('Acier','fy = '+fy+' MPa')+
+    irow('Section nette An',(An*1e4).toFixed(1)+' cm&sup2;')+
+    irow('Perimetre de frottement',peri.toFixed(3)+' m')+
+    '</div><div>'+
+    irow('Energie reelle',Math.round(eta*100)+'% x '+Wr+' = '+E.toFixed(1)+' kJ')+
+    irow('Profondeur battue',prof.toFixed(1)+' m')+
+    irow('qp a la pointe',qp_pt+' MPa')+
+    irow('Cas',''+CC.charAt(0).toUpperCase()+CC.slice(1)+(CC==='nador'?' — '+NZ[CZ].label:''))+
+    '</div></div></div>';
+
+  document.getElementById('rz').innerHTML=html;
+  sw('resultats');
+}
+
+// Init par defaut
+(function(){
+  addPreset('sable_lache');addPreset('sable_dense');addPreset('tuf');
+  layers[0].ep=5;layers[1].ep=10;layers[2].ep=15;
+  renderLayers();loadH('ihc250');updQr();
+})();
+</script>
+</body>
+</html>
