@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battabilité des Pieux Métalliques</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f4f6fa;color:#1a2236;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+.hero{background:linear-gradient(135deg,#1a2c5b 0%,#1e3a8a 60%,#1e40af 100%);padding:2.5rem 2rem 2rem;text-align:center;color:#fff}
+.hero-sub{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#93c5fd;margin-bottom:.8rem;font-weight:500}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:.4rem}
+.hero-by{font-size:.8rem;color:#bfdbfe;letter-spacing:.04em}
+.tabs-bar{background:#fff;border-bottom:1.5px solid #e5e8f0;display:flex;padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tab-btn{padding:.9rem 1.2rem;font-size:.82rem;font-weight:600;color:#64748b;border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;font-family:inherit;letter-spacing:.02em;transition:all .2s;white-space:nowrap}
+.tab-btn.active{color:#1e40af;border-bottom-color:#1e40af}
+.tab-btn:hover:not(.active){color:#334155}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.page{max-width:1100px;margin:0 auto;padding:1.5rem}
+.two-col{display:grid;grid-template-columns:240px 1fr;gap:1.4rem;align-items:start}
+@media(max-width:800px){.two-col{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1.4rem}
+.card+.card{margin-top:1.2rem}
+.card-head{font-size:.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:1rem;padding-bottom:.55rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:.5rem}
+.card-head-icon{width:20px;height:20px;border-radius:5px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:11px}
+label.lbl{display:block;font-size:.7rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.28rem}
+input[type=number],input[type=text],select{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#1a2236;font-size:.88rem;padding:.48rem .7rem;font-family:inherit;transition:border-color .2s,box-shadow .2s;outline:none;appearance:auto}
+input:focus,select:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem}
+.row1{margin-bottom:.8rem}
+.soil-visual-col{border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;min-height:40px;width:100%}
+.soil-layer-bar{transition:all .3s ease;display:flex;align-items:center;padding:0 10px;font-size:.63rem;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.04em;overflow:hidden;min-height:18px;text-shadow:0 1px 3px rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.1)}
+.layer-item{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:.95rem 1rem;margin-bottom:.65rem;position:relative;transition:border-color .2s,box-shadow .2s}
+.layer-item:hover{border-color:#93c5fd;box-shadow:0 2px 8px rgba(59,130,246,.08)}
+.layer-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.layer-head{display:flex;align-items:center;gap:.4rem;margin-bottom:.65rem;flex-wrap:wrap}
+.layer-num{font-size:.65rem;font-weight:700;color:#fff;background:#3b82f6;border-radius:4px;padding:1px 6px;flex-shrink:0}
+.layer-name-display{font-size:.85rem;font-weight:600;color:#1e293b;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.layer-meta{font-size:.68rem;color:#94a3b8;white-space:nowrap}
+.warn-icon{color:#f59e0b;font-size:.72rem}
+.btn-remove-layer{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:.95rem;padding:2px 5px;border-radius:4px;transition:color .15s;flex-shrink:0;line-height:1}
+.btn-remove-layer:hover{color:#ef4444}
+.layer-fields{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+@media(max-width:500px){.layer-fields{grid-template-columns:1fr}}
+.btn-add-layer{width:100%;background:transparent;border:1.5px dashed #cbd5e1;border-radius:10px;padding:.65rem;color:#64748b;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:.2rem}
+.btn-add-layer:hover{border-color:#3b82f6;color:#1e40af;background:#eff6ff}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.52rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s;border:1.5px solid transparent}
+.btn-blue{background:#1e40af;color:#fff;border-color:#1e40af}
+.btn-blue:hover{background:#1d4ed8;box-shadow:0 4px 12px rgba(30,64,175,.25)}
+.btn-outline{background:transparent;color:#1e40af;border-color:#bfdbfe}
+.btn-outline:hover{background:#eff6ff}
+.btn-calc{width:100%;justify-content:center;background:linear-gradient(135deg,#1d4ed8,#1e40af);color:#fff;padding:.85rem;font-size:.93rem;letter-spacing:.02em;border-radius:10px;border:none;box-shadow:0 4px 14px rgba(30,64,175,.22)}
+.btn-calc:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(30,64,175,.32)}
+.preset-row{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1rem}
+.preset-pill{background:#f1f5f9;border:1.5px solid #e2e8f0;color:#334155;border-radius:999px;padding:.28rem .85rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:.02em}
+.preset-pill:hover{background:#eff6ff;border-color:#93c5fd;color:#1e40af}
+.preset-pill.active-preset{background:#1e40af;color:#fff;border-color:#1e40af}
+.verdict{border-radius:14px;padding:1.5rem;text-align:center;border:2px solid;margin-bottom:1.2rem}
+.v-green{background:#f0fdf4;border-color:#22c55e}
+.v-amber{background:#fffbeb;border-color:#f59e0b}
+.v-red{background:#fef2f2;border-color:#ef4444}
+.verdict-icon{font-size:2rem;margin-bottom:.35rem}
+.verdict-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
+.verdict-title.g{color:#16a34a}
+.verdict-title.a{color:#d97706}
+.verdict-title.r{color:#dc2626}
+.verdict-sub{font-size:.82rem;color:#475569}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.7rem;margin-bottom:1.2rem}
+.mbox{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:.85rem 1rem}
+.mbox-label{font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.22rem}
+.mbox-value{font-size:1.25rem;font-weight:700}
+.mbox-unit{font-size:.68rem;color:#94a3b8;margin-left:2px;font-weight:400}
+.col-ok{color:#16a34a}
+.col-warn{color:#d97706}
+.col-bad{color:#dc2626}
+.col-blue{color:#1e40af}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{background:#f8fafc;color:#64748b;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:.55rem .75rem;text-align:left;border-bottom:1px solid #e2e8f0}
+td{padding:.55rem .75rem;border-bottom:1px solid #f1f5f9;color:#334155}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfe}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:.65rem;font-weight:700}
+.tag-ok{background:#dcfce7;color:#16a34a}
+.tag-hors{background:#f1f5f9;color:#94a3b8}
+.chart-wrap{position:relative;width:100%;height:250px;margin-top:.6rem}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.6rem .85rem;font-size:.76rem;color:#1e40af;margin-bottom:.8rem;line-height:1.5}
+.sec-lbl{font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin:1.1rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid #f1f5f9}
+.results-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem}
+@media(max-width:700px){.results-grid-2{grid-template-columns:1fr}}
+footer{text-align:center;padding:1.8rem;color:#94a3b8;font-size:.73rem;border-top:1px solid #e2e8f0;margin-top:3rem}
+footer strong{color:#1e40af}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-sub">Géotechnique · Analyse de Battabilité</div>
+  <h1>Battabilité des Pieux Métalliques</h1>
+  <div class="hero-by">Généré par Alaa Eddine Ezzebdi &amp; Yahya Sarouf</div>
+</div>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('soil',this)">🌍 Profil de sol</button>
+  <button class="tab-btn" onclick="switchTab('pile',this)">🔩 Pieu &amp; Marteau</button>
+  <button class="tab-btn" onclick="switchTab('results',this)">📊 Résultats</button>
+</div>
+
+<!-- ═══════════════ TAB 1 : SOIL ═══════════════ -->
+<div id="tab-soil" class="tab-content active">
+<div class="page">
+  <div class="info-box">
+    📌 Ajoutez les couches de haut en bas. Les cotes sont en <strong>mZH</strong> (valeurs négatives). Le profil se met à jour automatiquement à gauche.
+  </div>
+  <div class="two-col">
+
+    <!-- LEFT: visual profile -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">📐</div>Profil stratigraphique</div>
+        <div id="soil-visual" class="soil-visual-col" style="min-height:60px"></div>
+        <div id="soil-legend" style="margin-top:.8rem;font-size:.7rem;color:#475569;line-height:1.8"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: layers editor -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">🏔</div>Profil Stratigraphique — ajouter les couches de haut en bas</div>
+
+        <div class="sec-lbl">Configuration rapide</div>
+        <div class="preset-row">
+          <button class="preset-pill active-preset" id="pp-nador" onclick="loadPreset('nador',this)">Nador West Med — Zone II</button>
+          <button class="preset-pill" id="pp-vide" onclick="loadPreset('vide',this)">Profil vide</button>
+        </div>
+
+        <div id="layers-list"></div>
+        <button class="btn-add-layer" onclick="addLayer()">+ Ajouter une couche</button>
+
+        <div class="sec-lbl" style="margin-top:1.2rem">Paramètres dynamiques (Smith)</div>
+        <div class="row2">
+          <div><label class="lbl">Quake pointe qs (mm)</label><input type="number" id="quake_toe" value="2.5" step="0.1" min="0.1"></div>
+          <div><label class="lbl">Quake fût qs (mm)</label><input type="number" id="quake_shaft" value="2.5" step="0.1" min="0.1"></div>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Damping pointe J (s/m)</label><input type="number" id="damp_toe" value="0.50" step="0.05" min="0"></div>
+          <div><label class="lbl">Damping fût J (s/m)</label><input type="number" id="damp_shaft" value="0.25" step="0.05" min="0"></div>
+        </div>
+        <button class="btn btn-blue" style="width:100%;justify-content:center;margin-top:.5rem"
+          onclick="switchTab('pile',document.querySelectorAll('.tab-btn')[1])">Suivant : Pieu &amp; Marteau →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ TAB 2 : PILE & HAMMER ═══════════════ -->
+<div id="tab-pile" class="tab-content">
+<div class="page">
+  <div class="two-col">
+
+    <!-- Pile -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">🔩</div>Paramètres du pieu</div>
+        <div class="sec-lbl">Configurations types</div>
+        <div class="preset-row">
+          <button class="preset-pill" onclick="setPile(1422,20.6,48.77,17.57,-21.2,-38.79,440,'open')">Ø1422 · t20.6</button>
+          <button class="preset-pill" onclick="setPile(1219,23.8,43.6,32.17,-9.43,-41.6,440,'open')">Ø1219 · t23.8</button>
+          <button class="preset-pill" onclick="setPile(1000,20,40,25,-5,-30,355,'open')">Ø1000 · t20</button>
+          <button class="preset-pill" onclick="setPile(800,16,35,20,-3,-23,355,'closed')">Ø800 fermé</button>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Diamètre ext. D (mm)</label><input type="number" id="pile_D" value="1000" step="1" min="100"></div>
+          <div><label class="lbl">Épaisseur t (mm)</label><input type="number" id="pile_t" value="20" step="0.5" min="1"></div>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Longueur totale (m)</label><input type="number" id="pile_L" value="40" step="0.1" min="1"></div>
+          <div><label class="lbl">Longueur battue (m)</label><input type="number" id="pile_emb" value="25" step="0.1" min="1"></div>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Cote TN / remblai (mZH)</label><input type="number" id="pile_cutoff" value="-21.0" step="0.1"></div>
+          <div><label class="lbl">Cote pied cible (mZH)</label><input type="number" id="pile_toe" value="-38.0" step="0.1"></div>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Limite élastique fy (MPa)</label><input type="number" id="pile_fy" value="440" step="1" min="100"></div>
+          <div>
+            <label class="lbl">Condition de pointe</label>
+            <select id="pile_plug">
+              <option value="open">Ouverte (open-ended)</option>
+              <option value="closed">Fermée (closed-ended)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hammer -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">🔨</div>Paramètres du marteau</div>
+        <div class="sec-lbl">Configurations types</div>
+        <div class="preset-row">
+          <button class="preset-pill" onclick="setHammer(350,75,14000,2.5,'hydraulique')">IHC S-350 (Nador)</button>
+          <button class="preset-pill" onclick="setHammer(250,75,10000,2.5,'hydraulique')">IHC S-250</button>
+          <button class="preset-pill" onclick="setHammer(500,80,18000,2.8,'hydraulique')">IHC S-500</button>
+          <button class="preset-pill" onclick="setHammer(180,70,8000,2.3,'diesel')">Diesel 180 kJ</button>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Énergie nominale Wr (kJ)</label><input type="number" id="h_energy" value="350" step="1" min="1"></div>
+          <div><label class="lbl">Rendement η (%)</label><input type="number" id="h_eta" value="75" step="1" min="10" max="100"></div>
+        </div>
+        <div class="row2">
+          <div><label class="lbl">Masse mouton (kg)</label><input type="number" id="h_mass" value="14000" step="100" min="1"></div>
+          <div><label class="lbl">Hauteur de chute (m)</label><input type="number" id="h_stroke" value="2.5" step="0.1" min="0.1"></div>
+        </div>
+        <div class="row1">
+          <label class="lbl">Type de marteau</label>
+          <select id="h_type">
+            <option value="hydraulique">Hydraulique (IHC / Menck)</option>
+            <option value="diesel">Diesel</option>
+            <option value="drop">Drop hammer</option>
+          </select>
+        </div>
+        <div class="info-box">
+          ⚡ Énergie effective transmise : <strong id="eeff_preview">262.5 kJ</strong><br>
+          <span style="font-size:.7rem;opacity:.8">E_eff = Wr × η — mise à jour automatique</span>
+        </div>
+        <button class="btn-calc" onclick="calculate()">⚙ Calculer la battabilité</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ TAB 3 : RESULTS ═══════════════ -->
+<div id="tab-results" class="tab-content">
+<div class="page">
+
+  <div id="no-results" style="text-align:center;padding:3rem 1rem;color:#94a3b8">
+    <div style="font-size:2.5rem;margin-bottom:.8rem">🧮</div>
+    <div style="font-size:.92rem;font-weight:600;color:#475569">Aucun résultat</div>
+    <div style="font-size:.8rem;margin-top:.3rem">Complétez le profil de sol et les paramètres du pieu, puis lancez le calcul.</div>
+  </div>
+
+  <div id="results-content" style="display:none">
+
+    <div id="verdict-card" class="verdict v-green">
+      <div class="verdict-icon" id="v-icon">✓</div>
+      <div class="verdict-title g" id="v-title">BATTABLE</div>
+      <div class="verdict-sub" id="v-sub">Le sol est battable.</div>
+    </div>
+
+    <div class="metrics-grid" id="metrics-grid"></div>
+
+    <div class="results-grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">📊</div>Résistance par couche</div>
+        <div class="chart-wrap"><canvas id="resChart" role="img" aria-label="Résistance par couche de sol">Graphique résistance</canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-icon">📐</div>Profil de sol battu</div>
+        <div id="result-soil-visual" class="soil-visual-col" style="min-height:200px"></div>
+        <div id="result-soil-legend" style="margin-top:.7rem;font-size:.68rem;color:#475569;line-height:1.8"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-icon">📋</div>Détail par couche</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Nature</th><th>De (mZH)</th><th>À (mZH)</th>
+            <th>Ép. (m)</th><th>fs (kPa)</th><th>A_lat (m²)</th>
+            <th>Qs (kN)</th><th>Statut</th>
+          </tr></thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<footer>
+  <strong>Battabilité des Pieux Métalliques</strong> — Port Nador West Med · Extension TCO<br>
+  Généré par <strong>Alaa Eddine Ezzebdi</strong> &amp; <strong>Yahya Sarouf</strong><br>
+  <span style="font-size:.68rem;display:block;margin-top:.3rem">Méthode : Équation d'onde simplifiée (Hiley modifiée) · fs via LPC/IFP · Eurocode 7</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ══ SOIL DATABASE ════════════════════════════════════════
+const SOIL_DB = {
+  'Remblai 0-200mm':        {color:'#94a3b8',fs:58,  qp:0,  qc:5, warn:false},
+  'Sable coquillier lâche': {color:'#fde68a',fs:80,  qp:0,  qc:5, warn:false},
+  'Sable lâche':            {color:'#fbbf24',fs:100, qp:0,  qc:6, warn:false},
+  'Sable moyen':            {color:'#f59e0b',fs:150, qp:0,  qc:12,warn:false},
+  'Sable dense':            {color:'#d97706',fs:200, qp:0,  qc:22,warn:false},
+  'Conglomérat':            {color:'#6366f1',fs:180, qp:3.0,qc:25,warn:false},
+  'Tuf volcanique altéré':  {color:'#8b5cf6',fs:200, qp:2.0,qc:30,warn:false},
+  'Tuf volcanique sain':    {color:'#6d28d9',fs:245, qp:3.1,qc:53,warn:false},
+  'Marne grise':            {color:'#6b7280',fs:180, qp:2.5,qc:20,warn:false},
+  'Marne indurée':          {color:'#374151',fs:250, qp:3.5,qc:30,warn:false},
+  'Argile molle':           {color:'#86efac',fs:30,  qp:0.2,qc:1, warn:true},
+  'Argile raide':           {color:'#22c55e',fs:80,  qp:0.5,qc:5, warn:false},
+  'Gravier':                {color:'#92400e',fs:200, qp:3.0,qc:30,warn:false},
+  'Roche saine':            {color:'#1f2937',fs:300, qp:5.0,qc:60,warn:false},
+  'Autre':                  {color:'#9ca3af',fs:80,  qp:0,  qc:5, warn:false},
+};
+
+// ══ STATE ════════════════════════════════════════════════
+let layers = [];
+let lid    = 0;
+let chartI = null;
+
+// ══ LAYER MANAGEMENT ════════════════════════════════════
+function addLayer(data) {
+  lid++;
+  const id = 'L' + lid;
+  const d  = data || {name:'Sable lâche',from:'',to:'',fs:100,qp:0,qc:6};
+  layers.push({id, name:d.name, from:d.from, to:d.to, fs:d.fs, qp:d.qp, qc:d.qc});
+  renderLayers();
+}
+
+function removeLayer(id) {
+  layers = layers.filter(l => l.id !== id);
+  renderLayers();
+}
+
+function getV(id,field) {
+  const el = document.getElementById(id+'_'+field);
+  return el ? el.value : '';
+}
+
+function syncLayer(id) {
+  const l = layers.find(x => x.id === id);
+  if(!l) return;
+  l.name = getV(id,'name');
+  l.from = getV(id,'from');
+  l.to   = getV(id,'to');
+  l.fs   = parseFloat(getV(id,'fs')) || 0;
+  l.qp   = parseFloat(getV(id,'qp')) || 0;
+  l.qc   = parseFloat(getV(id,'qc')) || 0;
+  updateLayerHeader(id);
+  updateSoilVisual();
+}
+
+function updateLayerHeader(id) {
+  const l = layers.find(x => x.id === id);
+  if(!l) return;
+  const db   = SOIL_DB[l.name] || SOIL_DB['Autre'];
+  const dotEl = document.getElementById('dot_'+id);
+  const nmEl  = document.getElementById('nm_'+id);
+  const metaEl= document.getElementById('meta_'+id);
+  if(dotEl) dotEl.style.background = db.color;
+  if(nmEl)  nmEl.innerHTML = l.name + (db.warn?'<span class="warn-icon"> ⚠</span>':'');
+  const from = parseFloat(l.from), to = parseFloat(l.to);
+  if(!isNaN(from)&&!isNaN(to)&&from>to && metaEl) {
+    const ep = Math.abs(to-from).toFixed(1);
+    metaEl.innerHTML = `${ep}m &middot; ${from.toFixed(1)}&rarr;${to.toFixed(1)} mZH &middot; qc=${l.qc}MPa`;
+  } else if(metaEl) {
+    metaEl.textContent = '';
+  }
+}
+
+function onNameChange(id) {
+  const nm = getV(id,'name');
+  const db = SOIL_DB[nm] || SOIL_DB['Autre'];
+  const fsEl = document.getElementById(id+'_fs');
+  const qpEl = document.getElementById(id+'_qp');
+  const qcEl = document.getElementById(id+'_qc');
+  if(fsEl) fsEl.value = db.fs;
+  if(qpEl) qpEl.value = db.qp;
+  if(qcEl) qcEl.value = db.qc;
+  syncLayer(id);
+}
+
+function renderLayers() {
+  const container = document.getElementById('layers-list');
+  if(!container) return;
+  container.innerHTML = '';
+  layers.forEach((l,i) => {
+    const db = SOIL_DB[l.name] || SOIL_DB['Autre'];
+    const from = parseFloat(l.from), to = parseFloat(l.to);
+    let metaStr = '';
+    if(!isNaN(from)&&!isNaN(to)&&from>to) {
+      const ep = Math.abs(to-from).toFixed(1);
+      metaStr = `${ep}m &middot; ${from.toFixed(1)}&rarr;${to.toFixed(1)} mZH &middot; qc=${l.qc}MPa`;
+    }
+    const opts = Object.keys(SOIL_DB).map(k=>`<option value="${k}"${k===l.name?' selected':''}>${k}</option>`).join('');
+    const div = document.createElement('div');
+    div.className = 'layer-item';
+    div.id = 'litem_'+l.id;
+    div.innerHTML = `
+      <div class="layer-head">
+        <span class="layer-num">${i+1}</span>
+        <span class="layer-dot" id="dot_${l.id}" style="background:${db.color}"></span>
+        <span class="layer-name-display" id="nm_${l.id}">${l.name}${db.warn?'<span class="warn-icon"> ⚠</span>':''}</span>
+        <span class="layer-meta" id="meta_${l.id}">${metaStr}</span>
+        <button class="btn-remove-layer" onclick="removeLayer('${l.id}')" title="Supprimer">✕</button>
+      </div>
+      <div class="layer-fields">
+        <div><label class="lbl">Nature du sol</label>
+          <select id="${l.id}_name" onchange="onNameChange('${l.id}')">${opts}</select></div>
+        <div><label class="lbl">qc CPT (MPa)</label>
+          <input type="number" id="${l.id}_qc" value="${l.qc}" step="0.5" min="0" oninput="syncLayer('${l.id}')"></div>
+        <div><label class="lbl">Cote supérieure (mZH)</label>
+          <input type="number" id="${l.id}_from" value="${l.from}" step="0.1" oninput="syncLayer('${l.id}')"></div>
+        <div><label class="lbl">Cote inférieure (mZH)</label>
+          <input type="number" id="${l.id}_to" value="${l.to}" step="0.1" oninput="syncLayer('${l.id}')"></div>
+        <div><label class="lbl">fs frottement (kPa)</label>
+          <input type="number" id="${l.id}_fs" value="${l.fs}" step="5" min="0" oninput="syncLayer('${l.id}')"></div>
+        <div><label class="lbl">qp résistance pointe (MPa)</label>
+          <input type="number" id="${l.id}_qp" value="${l.qp}" step="0.1" min="0" oninput="syncLayer('${l.id}')"></div>
+      </div>`;
+    container.appendChild(div);
+  });
+  updateSoilVisual();
+}
+
+// ══ SOIL VISUAL ═════════════════════════════════════════
+function buildVisual(elId, legendId, validLayers) {
+  const el = document.getElementById(elId);
+  if(!el) return;
+  el.innerHTML = '';
+  if(!validLayers || validLayers.length === 0) {
+    el.innerHTML = '<div style="padding:1rem;color:#94a3b8;font-size:.72rem;text-align:center">Entrez les cotes pour voir le profil</div>';
+    if(legendId){ const lg=document.getElementById(legendId); if(lg)lg.innerHTML=''; }
+    return;
+  }
+  const totalDepth = validLayers.reduce((s,l)=>s+Math.abs(parseFloat(l.to)-parseFloat(l.from)),0);
+  if(totalDepth<=0) return;
+  validLayers.forEach(l => {
+    const db = SOIL_DB[l.name]||SOIL_DB['Autre'];
+    const thick = Math.abs(parseFloat(l.to)-parseFloat(l.from));
+    const pct = thick/totalDepth*100;
+    const bar = document.createElement('div');
+    bar.className = 'soil-layer-bar';
+    bar.style.height = Math.max(pct,4)+'%';
+    bar.style.background = db.color;
+    bar.title = `${l.name} (${parseFloat(l.from).toFixed(1)} → ${parseFloat(l.to).toFixed(1)} mZH)`;
+    if(thick >= totalDepth*0.07) bar.textContent = l.name.length>18?l.name.slice(0,16)+'…':l.name;
+    el.appendChild(bar);
+  });
+  if(legendId) {
+    const lg = document.getElementById(legendId);
+    if(lg) lg.innerHTML = validLayers.map(l=>{
+      const db=SOIL_DB[l.name]||SOIL_DB['Autre'];
+      const ep=Math.abs(parseFloat(l.to)-parseFloat(l.from)).toFixed(1);
+      return `<div style="display:flex;align-items:center;gap:.4rem">
+        <span style="width:9px;height:9px;border-radius:2px;background:${db.color};display:inline-block;flex-shrink:0"></span>
+        ${l.name} <span style="color:#94a3b8">(${ep} m)</span></div>`;
+    }).join('');
+  }
+}
+
+function updateSoilVisual() {
+  const valid = layers.filter(l=>{
+    const f=parseFloat(l.from),t=parseFloat(l.to);
+    return !isNaN(f)&&!isNaN(t)&&f>t;
+  });
+  buildVisual('soil-visual','soil-legend',valid);
+}
+
+// ══ PRESETS ══════════════════════════════════════════════
+function loadPreset(key, btn) {
+  document.querySelectorAll('.preset-pill[id^=pp-]').forEach(b=>b.classList.remove('active-preset'));
+  if(btn) btn.classList.add('active-preset');
+  document.getElementById('layers-list').innerHTML='';
+  layers=[]; lid=0;
+  if(key==='nador') {
+    [
+      {name:'Remblai 0-200mm',        from:-21.2,to:-23.0,fs:58, qp:0,  qc:5},
+      {name:'Sable coquillier lâche', from:-23.0,to:-26.0,fs:100,qp:0,  qc:5},
+      {name:'Sable dense',            from:-26.0,to:-30.0,fs:200,qp:0,  qc:20},
+      {name:'Tuf volcanique sain',    from:-30.0,to:-45.0,fs:245,qp:3.1,qc:53},
+    ].forEach(l=>addLayer(l));
+  } else {
+    renderLayers();
+  }
+}
+
+function setPile(D,t,L,emb,co,toe,fy,plug) {
+  document.getElementById('pile_D').value=D;
+  document.getElementById('pile_t').value=t;
+  document.getElementById('pile_L').value=L;
+  document.getElementById('pile_emb').value=emb;
+  document.getElementById('pile_cutoff').value=co;
+  document.getElementById('pile_toe').value=toe;
+  document.getElementById('pile_fy').value=fy;
+  document.getElementById('pile_plug').value=plug;
+}
+
+function setHammer(en,eta,mass,stroke,type) {
+  document.getElementById('h_energy').value=en;
+  document.getElementById('h_eta').value=eta;
+  document.getElementById('h_mass').value=mass;
+  document.getElementById('h_stroke').value=stroke;
+  document.getElementById('h_type').value=type;
+  updateEeff();
+}
+
+function updateEeff() {
+  const Wr=parseFloat(document.getElementById('h_energy').value)||0;
+  const eta=parseFloat(document.getElementById('h_eta').value)||0;
+  const el=document.getElementById('eeff_preview');
+  if(el) el.textContent=(Wr*eta/100).toFixed(1)+' kJ';
+}
+
+// ══ TABS ════════════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ══ CALCULATE ═══════════════════════════════════════════
+function calculate() {
+  // Sync all layers from DOM
+  layers.forEach(l => {
+    l.name = getV(l.id,'name');
+    l.from = parseFloat(getV(l.id,'from'));
+    l.to   = parseFloat(getV(l.id,'to'));
+    l.fs   = parseFloat(getV(l.id,'fs')) || 0;
+    l.qp   = parseFloat(getV(l.id,'qp')) || 0;
+    l.qc   = parseFloat(getV(l.id,'qc')) || 0;
+  });
+
+  // Read pile params
+  const D_mm  = parseFloat(document.getElementById('pile_D').value);
+  const t_mm  = parseFloat(document.getElementById('pile_t').value);
+  const L_pile= parseFloat(document.getElementById('pile_L').value);
+  const L_emb = parseFloat(document.getElementById('pile_emb').value);
+  const fy    = parseFloat(document.getElementById('pile_fy').value);
+  const plug  = document.getElementById('pile_plug').value;
+  const co    = parseFloat(document.getElementById('pile_cutoff').value);
+  const toe   = parseFloat(document.getElementById('pile_toe').value);
+  const Wr    = parseFloat(document.getElementById('h_energy').value);
+  const eta   = parseFloat(document.getElementById('h_eta').value)/100;
+  const stroke= parseFloat(document.getElementById('h_stroke').value);
+  const qt_mm = parseFloat(document.getElementById('quake_toe').value);
+  const qs_mm = parseFloat(document.getElementById('quake_shaft').value);
+
+  if([D_mm,t_mm,L_pile,L_emb,Wr,fy].some(v=>isNaN(v)||v<=0)){
+    alert('Veuillez remplir tous les paramètres numériques du pieu et du marteau.'); return;
+  }
+  if(layers.length===0){ alert('Ajoutez au moins une couche de sol.'); return; }
+
+  // ── Geometry ────────────────────────────────────────
+  const D      = D_mm/1000;
+  const t      = t_mm/1000;
+  const Di     = D-2*t;
+  const Asteel = Math.PI/4*(D*D-Di*Di);
+  const Perim  = plug==='open' ? Math.PI*D+Math.PI*Di : Math.PI*D;
+  const Atoe   = plug==='closed' ? Math.PI/4*D*D : Asteel;
+
+  // ── Energy ─────────────────────────────────────────
+  const E_eff = Wr * eta;   // kJ = kN·m
+
+  // ── Static resistance ───────────────────────────────
+  let Qs_total=0;
+  const layerRes=[];
+
+  layers.forEach((l,i) => {
+    if(isNaN(l.from)||isNaN(l.to)){layerRes.push({...l,thick:0,Alat:0,Qs:0,active:false});return;}
+    // Intersection: pile from co (less negative) to toe (more negative)
+    // Layer: from l.from (less negative) to l.to (more negative)
+    // Intersection top = min of both tops (less negative) → max(co, l.from) is wrong
+    // We need the shallower of the two tops → the larger (less negative) value
+    const intTop = Math.min(co, l.from);   // less negative = shallower limit
+    const intBot = Math.max(toe, l.to);    // more negative = deeper limit
+    // But intersection of [co,toe] and [l.from,l.to] where values decrease downward:
+    // range pile: toe ≤ z ≤ co  (e.g. -38 ≤ z ≤ -21)
+    // range layer: l.to ≤ z ≤ l.from
+    // intersection: max(toe,l.to) ≤ z ≤ min(co,l.from)
+    const sectTop = Math.min(co, l.from);    // upper bound of intersection (less negative)
+    const sectBot = Math.max(toe, l.to);     // lower bound (more negative)
+    if(sectTop <= sectBot){layerRes.push({...l,thick:0,Alat:0,Qs:0,active:false});return;}
+
+    const thick = sectTop - sectBot;  // positive, in meters
+    const Alat  = Perim * thick;      // m²
+    const Qs    = l.fs * Alat;        // kPa × m² = kN ✓
+    Qs_total   += Qs;
+    layerRes.push({...l, thick, Alat, Qs, active:true});
+  });
+
+  // Toe layer: find the layer that contains the pile toe
+  const activeLayers = layers.filter(l=>!isNaN(l.from)&&!isNaN(l.to));
+  let toelayer = activeLayers[activeLayers.length-1];
+  for(const l of activeLayers) {
+    if(toe >= l.to && toe <= l.from) { toelayer = l; break; }
+  }
+  const qp_kPa = ((toelayer?.qp)||0)*1000;  // MPa → kPa
+  const Qp     = qp_kPa * Atoe;             // kPa × m² = kN ✓
+  const Q_ult  = Qs_total + Qp;             // kN
+
+  // ── Blow count (Hiley simplified) ──────────────────
+  const qt_m  = qt_mm/1000;
+  const qs_m  = qs_mm/1000;
+  const q_avg = Q_ult>0 ? (Qs_total*qs_m + Qp*qt_m)/Q_ult : qt_m;
+  let s_m     = Q_ult>0 ? E_eff/Q_ult - q_avg : -1;
+  let blows;
+  if(s_m <= 0.0002){ blows=999; s_m=0.0002; }
+  else blows = Math.round(0.1/s_m);
+
+  // ── Stress ──────────────────────────────────────────
+  const E_mod   = 210e6;
+  const sigma_kPa = Math.sqrt(2*E_eff*E_mod/(Asteel*L_pile));
+  const sigma_MPa = sigma_kPa/1000;
+  const sig_lim   = 0.9*fy;
+
+  // ── Verdict ─────────────────────────────────────────
+  let vclass,vicon,vtitle,vsub,tc;
+  if(blows>150||sigma_MPa>sig_lim){
+    vclass='v-red';  vicon='✕'; vtitle='NON BATTABLE';       tc='r';
+    vsub=`${blows>=999?'>150':blows} coups/10 cm — Marteau insuffisant ou contraintes dépassées.`;
+  } else if(blows>80||sigma_MPa>sig_lim*0.85){
+    vclass='v-amber'; vicon='⚠'; vtitle='BATTABILITÉ MARGINALE'; tc='a';
+    vsub=`${blows} coups/10 cm — Conditions difficiles, vérifier par essai PDA.`;
+  } else {
+    vclass='v-green'; vicon='✓'; vtitle='BATTABLE ✓';         tc='g';
+    vsub=`${blows} coups/10 cm — Battabilité confirmée.`;
+  }
+
+  const vc=document.getElementById('verdict-card');
+  vc.className='verdict '+vclass;
+  document.getElementById('v-icon').textContent=vicon;
+  const vt=document.getElementById('v-title');
+  vt.textContent=vtitle; vt.className='verdict-title '+tc;
+  document.getElementById('v-sub').textContent=vsub;
+
+  // ── Metrics ─────────────────────────────────────────
+  const M=[
+    {l:'Résistance ultime',    v:(Q_ult/1000).toFixed(2),   u:'MN',   c:Q_ult>10000?'ok':Q_ult>5000?'warn':'bad'},
+    {l:'Énergie effective',    v:E_eff.toFixed(0),           u:'kJ',   c:'blue'},
+    {l:'Coups / 10 cm',        v:blows>=999?'>150':blows,   u:'cp/10cm',c:blows<=80?'ok':blows<=120?'warn':'bad'},
+    {l:'Frottement Qs',        v:(Qs_total/1000).toFixed(2), u:'MN',   c:'blue'},
+    {l:'Résistance pointe Qp', v:(Qp/1000).toFixed(2),       u:'MN',   c:'blue'},
+    {l:'Contrainte max pieu',  v:sigma_MPa.toFixed(1),        u:'MPa',  c:sigma_MPa<=sig_lim?'ok':'bad'},
+    {l:'Limite σ (0.9·fy)',    v:sig_lim.toFixed(0),          u:'MPa',  c:'blue'},
+    {l:'Pénétration / coup',   v:(s_m*1000).toFixed(1),       u:'mm',   c:'blue'},
+  ];
+  document.getElementById('metrics-grid').innerHTML=M.map(m=>`
+    <div class="mbox">
+      <div class="mbox-label">${m.l}</div>
+      <div class="mbox-value col-${m.c}">${m.v}<span class="mbox-unit">${m.u}</span></div>
+    </div>`).join('');
+
+  // ── Table ────────────────────────────────────────────
+  document.getElementById('tbl-body').innerHTML=layerRes.map((l,i)=>`
+    <tr>
+      <td>${i+1}</td><td>${l.name}</td>
+      <td>${isNaN(l.from)?'-':parseFloat(l.from).toFixed(2)}</td>
+      <td>${isNaN(l.to)?'-':parseFloat(l.to).toFixed(2)}</td>
+      <td>${l.thick.toFixed(2)}</td><td>${l.fs}</td>
+      <td>${l.Alat.toFixed(2)}</td><td>${l.Qs.toFixed(0)}</td>
+      <td>${l.active
+        ?'<span class="tag tag-ok">Active</span>'
+        :'<span class="tag tag-hors">Hors portée</span>'}</td>
+    </tr>`).join('');
+
+  // ── Chart ────────────────────────────────────────────
+  const active = layerRes.filter(l=>l.active&&l.Qs>0);
+  const cL=[...active.map(l=>l.name),...(Qp>0?['Résistance pointe']:[])];
+  const cD=[...active.map(l=>+l.Qs.toFixed(0)),...(Qp>0?[+Qp.toFixed(0)]:[])];
+  const cC=active.map(l=>(SOIL_DB[l.name]||SOIL_DB['Autre']).color);
+  if(Qp>0) cC.push('#374151');
+
+  const canvas=document.getElementById('resChart');
+  if(chartI){chartI.destroy();chartI=null;}
+  chartI=new Chart(canvas,{
+    type:'bar',
+    data:{labels:cL,datasets:[{label:'Résistance (kN)',data:cD,
+      backgroundColor:cC.map(c=>c+'cc'),borderColor:cC,borderWidth:1.5,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y.toLocaleString()} kN`}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(0,0,0,.03)'}},
+        y:{ticks:{color:'#64748b',font:{size:10},callback:v=>v.toLocaleString()+' kN'},
+           grid:{color:'rgba(0,0,0,.03)'},
+           title:{display:true,text:'Résistance (kN)',color:'#94a3b8',font:{size:10}}}}}
+  });
+
+  // ── Result soil visual ───────────────────────────────
+  const validForResult = layerRes.filter(l=>l.active);
+  buildVisual('result-soil-visual','result-soil-legend',
+    validForResult.length ? validForResult : layers.filter(l=>{
+      const f=parseFloat(l.from),t=parseFloat(l.to);
+      return !isNaN(f)&&!isNaN(t)&&f>t;
+    })
+  );
+
+  // ── Show results ─────────────────────────────────────
+  document.getElementById('no-results').style.display='none';
+  document.getElementById('results-content').style.display='block';
+  switchTab('results', document.querySelectorAll('.tab-btn')[2]);
+}
+
+// ══ INIT ════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  ['h_energy','h_eta'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',updateEeff);
+  });
+  updateEeff();
+  loadPreset('nador', document.getElementById('pp-nador'));
+});
+</script>
+</body>
+</html>
