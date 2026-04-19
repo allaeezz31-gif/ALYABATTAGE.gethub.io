@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battabilité des Pieux Métalliques</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#ffffff;--bg:#f4f6fb;--bg2:#edf0f7;--card:#ffffff;
+  --border:#e2e6f0;--border2:#cdd2e6;
+  --text:#1a1f36;--muted:#6b7280;--muted2:#9ca3af;
+  --accent:#1e40af;--accent-light:#eff6ff;--accent-mid:#3b82f6;
+  --green:#059669;--green-bg:#ecfdf5;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --radius:10px;
+  --shadow:0 1px 3px rgba(30,40,80,0.08),0 0 0 1px rgba(30,40,80,0.05);
+  --shadow-md:0 4px 16px rgba(30,40,80,0.10),0 0 0 1px rgba(30,40,80,0.05)
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--border)}
+.hdr-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-ico{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+.brand-nm{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--text)}
+.hdr-meta{font-size:0.72rem;color:var(--muted)}
+
+/* TABS */
+.tabs{background:var(--white);border-bottom:1px solid var(--border)}
+.tabs-in{max-width:1120px;margin:0 auto;padding:0 1.5rem;display:flex}
+.tab{padding:.8rem 1.3rem;font-size:.82rem;font-weight:500;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--accent)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:background .2s}
+.tab.on .tab-dot{background:var(--accent-mid)}
+
+/* MAIN */
+.main{max-width:1120px;margin:0 auto;padding:1.6rem 1.5rem}
+.pane{display:none}.pane.on{display:block}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.3rem;margin-bottom:1.1rem}
+.card-ttl{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:5px}
+
+/* PRESET BAR */
+.pset-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:1.1rem}
+.pset-lbl{font-size:.72rem;color:var(--muted);font-weight:500;margin-right:4px}
+.pset-chip{padding:.26rem .8rem;font-size:.75rem;font-weight:500;border-radius:999px;border:1.5px solid var(--border2);background:var(--white);color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.pset-chip:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-light)}
+.pset-chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-light);font-weight:600}
+
+/* NADOR DROPDOWN */
+.nador-wrap{position:relative;display:inline-block}
+.nador-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:200;background:var(--white);border:1.5px solid var(--border2);border-radius:10px;box-shadow:0 8px 24px rgba(30,40,80,.13);min-width:300px;overflow:hidden}
+.nador-dropdown.open{display:block}
+.zone-btn{display:block;width:100%;padding:.65rem 1rem;font-size:.8rem;font-weight:500;font-family:inherit;background:none;border:none;text-align:left;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s}
+.zone-btn:last-child{border-bottom:none}
+.zone-btn:hover{background:var(--accent-light);color:var(--accent)}
+
+/* SOIL LAYOUT */
+.soil-lay{display:grid;grid-template-columns:72px 1fr;gap:1.2rem;align-items:start}
+@media(max-width:600px){.soil-lay{grid-template-columns:48px 1fr;gap:.7rem}}
+
+/* STRAT */
+.strat-col{position:sticky;top:90px}
+.strat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.strat-lbl{margin-top:6px;font-size:.62rem;color:var(--muted2);text-align:center;line-height:1.3}
+
+/* LAYER ITEM */
+.ly-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:.6rem;transition:border-color .15s,box-shadow .15s}
+.ly-item:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(30,40,80,.06)}
+.ly-item.open{border-color:var(--accent-mid);box-shadow:0 0 0 3px rgba(59,130,246,.09)}
+.ly-hdr{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.ly-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.ly-sum{flex:1}
+.ly-name{font-size:.87rem;font-weight:600;color:var(--text)}
+.ly-meta{font-size:.72rem;color:var(--muted);margin-top:1px}
+.ly-acts{display:flex;align-items:center;gap:3px}
+.ico-btn{width:25px;height:25px;border-radius:5px;border:none;background:none;color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;font-family:inherit}
+.ico-btn:hover{background:var(--bg2);color:var(--text)}
+.ico-btn.del:hover{background:#fef2f2;color:var(--red)}
+.ly-chev{font-size:9px;color:var(--muted2);transition:transform .2s;margin-left:2px}
+.ly-item.open .ly-chev{transform:rotate(180deg)}
+
+/* LAYER FIELDS */
+.ly-fields{display:none;margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border)}
+.ly-item.open .ly-fields{display:block}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem}
+@media(max-width:600px){.fg3{grid-template-columns:1fr 1fr}}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label,.fgl{font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.fg input,.fg select,input.fi,select.fi{padding:.4rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.86rem;font-family:inherit;color:var(--text);background:var(--white);transition:border-color .15s,box-shadow .15s;width:100%}
+.fg input:focus,.fg select:focus,input.fi:focus,select.fi:focus{outline:none;border-color:var(--accent-mid);box-shadow:0 0 0 3px rgba(59,130,246,.11)}
+.fg select option,select.fi option{background:var(--white)}
+
+/* ADD LAYER */
+.btn-add{width:100%;padding:.68rem;border:1.5px dashed var(--border2);border-radius:var(--radius);background:none;color:var(--muted);font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:.15rem}
+.btn-add:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-light)}
+
+/* PILE & HAMMER PANE */
+.ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+@media(max-width:680px){.ph-grid{grid-template-columns:1fr}}
+
+/* PILE VIZ */
+.pviz-wrap{display:flex;gap:.9rem;align-items:flex-start;margin-top:.75rem;padding:.9rem;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.pviz-leg{font-size:.75rem;color:var(--muted)}
+.pviz-leg div{margin-bottom:3px}
+.pviz-leg span{font-weight:600;color:var(--text)}
+
+/* INFO CHIP */
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-light);color:var(--accent);border-radius:6px;padding:.32rem .72rem;font-size:.75rem;font-weight:500;margin-top:.65rem}
+
+/* CALC BAR */
+.calc-bar{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);padding:.9rem 1.5rem;z-index:90}
+.calc-bar-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:flex-end;gap:1rem}
+.btn-calc{padding:.68rem 1.8rem;background:var(--accent);color:white;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;display:flex;align-items:center;gap:7px}
+.btn-calc:hover{background:#1e3a8a;transform:translateY(-1px);box-shadow:0 4px 12px rgba(30,64,175,.28)}
+.calc-hint{font-size:.76rem;color:var(--muted)}
+
+/* RESULTS */
+.verdict{border-radius:11px;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.3rem;margin-bottom:1.2rem;border:1.5px solid}
+.v-ok{background:var(--green-bg);border-color:#6ee7b7}
+.v-warn{background:var(--amber-bg);border-color:#fcd34d}
+.v-fail{background:var(--red-bg);border-color:#fca5a5}
+.v-ico{font-size:2.2rem;flex-shrink:0}
+.v-ttl{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:2px}
+.v-ok .v-ttl{color:var(--green)}.v-warn .v-ttl{color:var(--amber)}.v-fail .v-ttl{color:var(--red)}
+.v-desc{font-size:.83rem;color:var(--muted)}
+
+.mbox-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.1rem}
+@media(max-width:780px){.mbox-grid{grid-template-columns:repeat(2,1fr)}}
+.mbox{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;box-shadow:var(--shadow)}
+.mb-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:3px}
+.mb-val{font-size:1.25rem;font-weight:600}
+.mb-unit{font-size:.72rem;color:var(--muted);margin-left:2px;font-weight:400}
+.c-ok{color:var(--green)}.c-warn{color:var(--amber)}.c-bad{color:var(--red)}.c-blu{color:var(--accent)}
+
+.res-row{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.1rem}
+@media(max-width:680px){.res-row{grid-template-columns:1fr}}
+
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+th{background:var(--bg2);color:var(--muted);font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.62rem .82rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.58rem .82rem;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.66rem;font-weight:600}
+.b-ok{background:#d1fae5;color:#065f46}
+.b-skip{background:#f3f4f6;color:var(--muted)}
+
+.chart-wrap{position:relative;width:100%;height:250px}
+.no-res{text-align:center;padding:3rem;color:var(--muted);font-size:.9rem}
+
+footer{text-align:center;padding:1.3rem;color:var(--muted2);font-size:.73rem;border-top:1px solid var(--border);background:var(--white)}
+footer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="brand">
+      <div class="brand-ico">⚙</div>
+      <span class="brand-nm">Battabilité des Pieux</span>
+    </div>
+    <span class="hdr-meta">Alaa Eddine Ezzebdi &amp; Yahya Sarouf</span>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tabs-in">
+    <button class="tab on" id="t0" onclick="showTab(0)"><div class="tab-dot"></div>Profil de sol</button>
+    <button class="tab"    id="t1" onclick="showTab(1)"><div class="tab-dot"></div>Pieu &amp; Marteau</button>
+    <button class="tab"    id="t2" onclick="showTab(2)"><div class="tab-dot"></div>Résultats</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── PANE 0 : SOL ── -->
+  <div class="pane on" id="p0">
+    <div class="pset-row">
+      <span class="pset-lbl">Profil prédéfini :</span>
+      <div class="nador-wrap">
+        <button class="pset-chip" id="nador-main-btn" onclick="toggleNadorMenu(event)">
+          Nador West Med ▾
+        </button>
+        <div class="nador-dropdown" id="nador-dropdown">
+          <button class="zone-btn" onclick="preset('nadorZ1',document.getElementById('nador-main-btn'))">Zone I — CH 600–900 &nbsp;(Top Tuf : −27 m)</button>
+          <button class="zone-btn" onclick="preset('nadorZ2',document.getElementById('nador-main-btn'))">Zone II — CH 900–1120 &nbsp;(Top Tuf : −30 m)</button>
+          <button class="zone-btn" onclick="preset('nadorZ3',document.getElementById('nador-main-btn'))">Zone III — CH 1120–1250 (Top Tuf : −33 m)</button>
+          <button class="zone-btn" onclick="preset('nadorZ4',document.getElementById('nador-main-btn'))">Zone IV — CH 1250–1440 (Top Tuf : −37 m)</button>
+        </div>
+      </div>
+      <button class="pset-chip" id="vide-btn" onclick="preset('vide',this)">Vide — saisie manuelle</button>
+    </div>
+
+    <div class="soil-lay">
+      <div class="strat-col">
+        <div class="strat-box"><canvas id="sc" width="68" height="420"></canvas></div>
+        <div class="strat-lbl">Profil<br>strat.</div>
+      </div>
+      <div>
+        <div class="card" style="padding:1.1rem">
+          <div class="card-ttl">Profil stratigraphique — ajouter les couches de haut en bas</div>
+          <div id="lc"></div>
+          <button class="btn-add" onclick="addLayer(null,true)">+ Ajouter une couche</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANE 1 : PIEU & MARTEAU ── -->
+  <div class="pane" id="p1">
+    <div class="ph-grid">
+
+      <div class="card">
+        <div class="card-ttl">🔩 Pieu</div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Diamètre ext. D (mm)</label><input type="number" id="pD" value="1422" step="1" min="50" oninput="drawPV()"></div>
+          <div class="fg"><label>Épaisseur t (mm)</label><input type="number" id="pt" value="20.6" step=".5" min="1" oninput="drawPV()"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Longueur totale L (m)</label><input type="number" id="pL" value="48.77" step=".1" min="1"></div>
+          <div class="fg"><label>Longueur battue (m)</label><input type="number" id="pe" value="17.57" step=".1" min="1"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Cote TN / remblai (mZH)</label><input type="number" id="pcut" value="-21.00" step=".1"></div>
+          <div class="fg"><label>Cote pied cible (mZH)</label><input type="number" id="ptoe" value="-41.50" step=".1"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>SLS — Charge de service (kN)</label><input type="number" id="psls" value="9270" step="10" min="0"></div>
+          <div class="fg"><label>Critère de refus (coups/10 cm)</label><input type="number" id="pblref" value="61" step="1" min="1" max="300"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Nuance acier</label>
+            <select id="psteel" onchange="steelChange()">
+              <option value="S355">S355 (fy = 355 MPa)</option>
+              <option value="X65" selected>X65 (fy = 440 MPa)</option>
+              <option value="X70">X70 (fy = 480 MPa)</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+          <div class="fg"><label>Limite fy (MPa)</label><input type="number" id="pfy" value="440" step="5"></div>
+        </div>
+        <div class="fg" style="margin-bottom:.75rem">
+          <label>Condition pointe</label>
+          <select id="pplug">
+            <option value="open">Ouverte (tube)</option>
+            <option value="closed">Fermée (pleine)</option>
+          </select>
+        </div>
+        <div class="pviz-wrap">
+          <canvas id="pvc" width="86" height="86"></canvas>
+          <div class="pviz-leg">
+            <div>D ext : <span id="pvD">1422</span> mm</div>
+            <div>D int : <span id="pvDi">1380.8</span> mm</div>
+            <div>Épaisseur : <span id="pvT">20.6</span> mm</div>
+            <div>A acier : <span id="pvA">0.0913</span> m²</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-ttl">🔨 Marteau</div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Modèle prédéfini</label>
+            <select id="hpre" onchange="hPreset()">
+              <option value="ihc350">IHC S-350 (350 kJ) — Nador</option>
+              <option value="ihc250">IHC SC-250 (244 kJ)</option>
+              <option value="ihc500">IHC S-500 (500 kJ)</option>
+              <option value="menck400">MENCK MHU-400 (400 kJ)</option>
+              <option value="custom">Personnalisé</option>
+            </select>
+          </div>
+          <div class="fg"><label>Type</label>
+            <select id="htype">
+              <option value="hydraulique" selected>Hydraulique</option>
+              <option value="diesel">Diesel</option>
+              <option value="drop">Drop hammer</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Énergie nominale Wr (kJ)</label><input type="number" id="hWr" value="350" step="10" min="10" oninput="updEeff()"></div>
+          <div class="fg"><label>Rendement η (%)</label><input type="number" id="heta" value="75" step="1" min="10" max="100" oninput="updEeff()"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Masse mouton (kg)</label><input type="number" id="hmass" value="16500" step="100"></div>
+          <div class="fg"><label>Hauteur de chute (m)</label><input type="number" id="hstroke" value="2.025" step=".05" min=".1"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.65rem">
+          <div class="fg"><label>Soil Quake pointe (mm)</label><input type="number" id="qtoe" value="2.5" step=".5"></div>
+          <div class="fg"><label>Soil Quake fût (mm)</label><input type="number" id="qshaft" value="2.5" step=".5"></div>
+        </div>
+        <div class="fg2" style="margin-bottom:.1rem">
+          <div class="fg"><label>Damping J pointe (s/m)</label><input type="number" id="dtoe" value="0.50" step=".05"></div>
+          <div class="fg"><label>Damping J fût (s/m)</label><input type="number" id="dshaft" value="0.25" step=".05"></div>
+        </div>
+        <div class="chip">⚡ Énergie effective : <strong id="eeff" style="margin:0 3px">263 kJ</strong></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANE 2 : RÉSULTATS ── -->
+  <div class="pane" id="p2">
+    <div id="res-content">
+      <div class="no-res">
+        <div style="font-size:2rem;margin-bottom:.7rem">⚙</div>
+        Aucun calcul effectué. Remplissez les données et cliquez sur <strong>Calculer</strong>.
+      </div>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<div class="calc-bar">
+  <div class="calc-bar-in">
+    <span class="calc-hint">Profil : <span id="hl">0</span> couche(s)</span>
+    <button class="btn-calc" onclick="calc()">⚙ Calculer la battabilité</button>
+  </div>
+</div>
+
+<footer>
+  <strong>Battabilité des Pieux Métalliques</strong> — Alaa Eddine Ezzebdi &amp; Yahya Sarouf
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="battabilite.js"></script>
+</body>
+</html>
